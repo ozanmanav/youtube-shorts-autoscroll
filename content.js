@@ -49,6 +49,21 @@ setInterval(() => {
   }
 }, POLL_INTERVAL_MS);
 
+function toggle() {
+  enabled = !enabled;
+  chrome.storage.local.set({ enabled });
+  renderButton();
+}
+
+// Keyboard shortcut: Alt+S toggles auto scroll (ignored while typing)
+document.addEventListener("keydown", (e) => {
+  if (!isShortsPage() || !e.altKey || e.code !== "KeyS") return;
+  const t = e.target;
+  if (t && (t.isContentEditable || /^(INPUT|TEXTAREA)$/.test(t.tagName))) return;
+  e.preventDefault();
+  toggle();
+});
+
 // Small on-page toggle button
 function renderButton() {
   let btn = document.getElementById("shorts-autoscroll-toggle");
@@ -67,11 +82,8 @@ function renderButton() {
       fontSize: "14px",
       cursor: "pointer",
     });
-    btn.addEventListener("click", () => {
-      enabled = !enabled;
-      chrome.storage.local.set({ enabled });
-      renderButton();
-    });
+    btn.title = "Toggle auto scroll (Alt+S)";
+    btn.addEventListener("click", toggle);
     document.body.appendChild(btn);
   }
   btn.textContent = enabled ? "Auto Scroll: ON" : "Auto Scroll: OFF";
