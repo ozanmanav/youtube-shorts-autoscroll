@@ -1,0 +1,29 @@
+name: Bug report
+description: Auto scroll stopped working or behaves strangely
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: For example "it does not move to the next Short" or "the button is missing".
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 131, Edge 131, Brave 1.73 ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Extension version
+      description: Shown on chrome://extensions
+      placeholder: "1.2.0"
+  - type: input
+    id: url
+    attributes:
+      label: Example Short URL (optional)
+      placeholder: https://www.youtube.com/shorts/...
