@@ -1,9 +1,12 @@
 // YouTube Shorts Auto Scroll
-// Shorts videoları loop'ta oynar, "ended" event'i gelmez.
-// Bu yüzden aktif videoyu izleyip sona yaklaşınca sonraki Short'a geçiyoruz.
+// Shorts loop forever, so the video "ended" event never fires.
+// Instead we watch the active video and move to the next Short right before it ends.
+
+const END_THRESHOLD_SECONDS = 0.4;
+const POLL_INTERVAL_MS = 250;
 
 let enabled = true;
-let lastSkippedSrc = null;
+let lastSkippedPath = null;
 
 chrome.storage.local.get({ enabled: true }, (data) => {
   enabled = data.enabled;
@@ -28,7 +31,7 @@ function goNext() {
     nextBtn.click();
     return;
   }
-  // Yedek yol: klavyede aşağı ok
+  // Fallback: simulate the ArrowDown key
   document.dispatchEvent(
     new KeyboardEvent("keydown", { key: "ArrowDown", code: "ArrowDown", keyCode: 40, bubbles: true })
   );
@@ -39,14 +42,14 @@ setInterval(() => {
   const video = getActiveVideo();
   if (!video || !video.duration || video.paused) return;
 
-  const id = location.pathname;
-  if (video.currentTime >= video.duration - 0.4 && lastSkippedSrc !== id) {
-    lastSkippedSrc = id;
+  const path = location.pathname;
+  if (video.currentTime >= video.duration - END_THRESHOLD_SECONDS && lastSkippedPath !== path) {
+    lastSkippedPath = path;
     goNext();
   }
-}, 250);
+}, POLL_INTERVAL_MS);
 
-// Sayfada küçük açma/kapama butonu
+// Small on-page toggle button
 function renderButton() {
   let btn = document.getElementById("shorts-autoscroll-toggle");
   if (!btn) {
@@ -76,5 +79,5 @@ function renderButton() {
   btn.style.display = isShortsPage() ? "block" : "none";
 }
 
-// YouTube SPA, sayfa değişince butonu göster/gizle
+// YouTube is a SPA: show/hide the button on every in-app navigation
 document.addEventListener("yt-navigate-finish", renderButton);
