@@ -31,7 +31,8 @@ watching, you have to keep swiping. This extension does the swipe for you, right
   or click the extension icon in the toolbar. The icon badge always shows the current state.
 - **Keyboard shortcut:** `Alt + S` turns auto scroll on or off.
 - **Remembers your choice** between sessions and keeps every open tab in sync.
-- **Respects you:** does nothing when the video is paused or the tab is in the background.
+- **Works in the background:** keeps going while you use another tab, so you can just listen.
+- **Respects you:** never skips a video you paused.
 - **Private by design:** only runs on `youtube.com`, the only permission is `storage`, no network requests.
 
 ## Install
@@ -61,10 +62,19 @@ Works in any Chromium-based browser: Chrome, Edge, Brave, Opera, Arc, Vivaldi.
 
 ## How it works
 
-Shorts play in a loop, so the browser never fires an `ended` event. The content script checks the
-active video a few times per second. When playback reaches the last fraction of a second, it clicks
-YouTube's own "next" button (falling back to an `ArrowDown` key press). The page logic lives in
-[`content.js`](content.js); [`background.js`](background.js) only handles the toolbar icon.
+Shorts play in a loop, so the browser never fires an `ended` event. Instead the extension listens to
+the video's `timeupdate` event, which keeps firing even in background tabs. When playback reaches the
+last fraction of a second it moves on:
+
+- in a visible tab it clicks YouTube's own "next" button, so you see the usual scroll animation;
+- in a background tab that button does nothing, so it uses YouTube's in-app navigation with the next
+  Short from YouTube's own Shorts list.
+
+| File | Role |
+| --- | --- |
+| [`main.js`](main.js) | Runs in the page, detects the end of a Short and moves on. |
+| [`content.js`](content.js) | Saved on/off state, the on-page button and `Alt + S`. |
+| [`background.js`](background.js) | Toolbar icon and its ON/OFF badge. |
 
 ## Troubleshooting
 
@@ -83,17 +93,18 @@ An end-to-end test loads the extension into Chromium and checks it against the r
 ```bash
 npm install
 npx playwright install chromium
-npm test            # HEADED=1 npm test to watch it
+npm test                   # foreground flow, HEADED=1 npm test to watch it
+npm run test:background    # keeps scrolling while the tab is hidden (opens a window)
 ```
 
-YouTube changes its markup from time to time. If the test fails, the selectors in `content.js` are the first place to look.
+YouTube changes its markup from time to time. If a test fails, the selectors and the Shorts list lookup in `main.js` are the first place to look.
 
 ## Türkçe
 
 YouTube Shorts'ta video bitince otomatik olarak bir sonrakine geçen küçük bir Chrome eklentisi.
 Kurmak için [Releases](https://github.com/ozanmanav/youtube-shorts-autoscroll/releases) sayfasından
 zip'i indir, `chrome://extensions` sayfasında **Developer mode**'u aç ve **Load unpacked** ile klasörü seç.
-Sağ alttaki butonla, toolbar'daki eklenti icon'una tıklayarak ya da `Alt + S` ile açıp kapatabilirsin.
+Başka bir sekmeye geçsen de çalışmaya devam eder. Sağ alttaki butonla, toolbar'daki eklenti icon'una tıklayarak ya da `Alt + S` ile açıp kapatabilirsin.
 
 ## License
 
