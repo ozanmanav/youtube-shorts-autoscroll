@@ -38,7 +38,7 @@ function goNext() {
 }
 
 setInterval(() => {
-  if (!enabled || !isShortsPage()) return;
+  if (!enabled || document.hidden || !isShortsPage()) return;
   const video = getActiveVideo();
   if (!video || !video.duration || video.paused) return;
 
