@@ -1,12 +1,8 @@
-// YouTube Shorts Auto Scroll
-// Shorts loop forever, so the video "ended" event never fires.
-// Instead we watch the active video and move to the next Short right before it ends.
-
-const END_THRESHOLD_SECONDS = 0.4;
-const POLL_INTERVAL_MS = 250;
+// YouTube Shorts Auto Scroll: extension-world part.
+// Owns the saved on/off state, the on-page button and the keyboard shortcut.
+// The actual scrolling happens in main.js, which reads the state from a data attribute.
 
 let enabled = true;
-let lastSkippedPath = null;
 
 chrome.storage.local.get({ enabled: true }, (data) => {
   enabled = data.enabled;
@@ -24,38 +20,6 @@ function isShortsPage() {
   return location.pathname.startsWith("/shorts/");
 }
 
-function getActiveVideo() {
-  return (
-    document.querySelector("ytd-reel-video-renderer[is-active] video") ||
-    document.querySelector("#shorts-player video") ||
-    document.querySelector("ytd-shorts video")
-  );
-}
-
-function goNext() {
-  const nextBtn = document.querySelector("#navigation-button-down button");
-  if (nextBtn) {
-    nextBtn.click();
-    return;
-  }
-  // Fallback: simulate the ArrowDown key
-  document.dispatchEvent(
-    new KeyboardEvent("keydown", { key: "ArrowDown", code: "ArrowDown", keyCode: 40, bubbles: true })
-  );
-}
-
-setInterval(() => {
-  if (!enabled || document.hidden || !isShortsPage()) return;
-  const video = getActiveVideo();
-  if (!video || !video.duration || video.paused) return;
-
-  const path = location.pathname;
-  if (video.currentTime >= video.duration - END_THRESHOLD_SECONDS && lastSkippedPath !== path) {
-    lastSkippedPath = path;
-    goNext();
-  }
-}, POLL_INTERVAL_MS);
-
 function toggle() {
   chrome.storage.local.set({ enabled: !enabled });
 }
@@ -71,6 +35,7 @@ document.addEventListener("keydown", (e) => {
 
 // Small on-page toggle button
 function renderButton() {
+  document.documentElement.dataset.shortsAutoscroll = enabled ? "on" : "off";
   let btn = document.getElementById("shorts-autoscroll-toggle");
   if (!btn) {
     btn = document.createElement("button");

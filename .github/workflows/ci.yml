@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: 22
       - name: Syntax check
-        run: node --check content.js && node --check background.js
+        run: node --check content.js && node --check main.js && node --check background.js
       - name: Validate manifest
         run: |
           node -e '
