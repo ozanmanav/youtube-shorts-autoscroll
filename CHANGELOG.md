@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 - 2026-11-24
+
+- Click the toolbar icon to toggle auto scroll; the badge shows ON or OFF.
+- The on/off state stays in sync across all open YouTube tabs.
+- Playwright end-to-end test against the real Shorts page, CI checks and issue templates.
+
 ## 1.1.0 - 2026-11-24
 
 - Extension icons.
