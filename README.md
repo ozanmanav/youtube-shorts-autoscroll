@@ -11,6 +11,8 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
+  <a href="https://github.com/ozanmanav/youtube-shorts-autoscroll/releases/latest"><img src="https://img.shields.io/github/v/release/ozanmanav/youtube-shorts-autoscroll" alt="Latest release"></a>
+  <a href="https://github.com/ozanmanav/youtube-shorts-autoscroll/actions/workflows/ci.yml"><img src="https://github.com/ozanmanav/youtube-shorts-autoscroll/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/manifest-v3-brightgreen.svg" alt="Manifest V3">
   <img src="https://img.shields.io/badge/browser-Chrome%20%7C%20Edge%20%7C%20Brave-orange.svg" alt="Chromium browsers">
 </p>
@@ -25,9 +27,10 @@ watching, you have to keep swiping. This extension does the swipe for you, right
 ## Features
 
 - **Hands-free:** jumps to the next Short just before the current one finishes.
-- **One-click toggle:** an ON/OFF button in the bottom-right corner of the Shorts page.
+- **One-click toggle:** an ON/OFF button in the bottom-right corner of the Shorts page,
+  or click the extension icon in the toolbar. The icon badge always shows the current state.
 - **Keyboard shortcut:** `Alt + S` turns auto scroll on or off.
-- **Remembers your choice** between sessions.
+- **Remembers your choice** between sessions and keeps every open tab in sync.
 - **Respects you:** does nothing when the video is paused or the tab is in the background.
 - **Private by design:** only runs on `youtube.com`, the only permission is `storage`, no network requests.
 
@@ -54,14 +57,14 @@ Works in any Chromium-based browser: Chrome, Edge, Brave, Opera, Arc, Vivaldi.
 
 1. Open any Short, for example [youtube.com/shorts](https://www.youtube.com/shorts).
 2. Watch. When a Short ends, the next one starts automatically.
-3. Use the button in the bottom-right corner or `Alt + S` to pause auto scroll.
+3. To pause auto scroll, use the button in the bottom-right corner, the toolbar icon or `Alt + S`.
 
 ## How it works
 
 Shorts play in a loop, so the browser never fires an `ended` event. The content script checks the
 active video a few times per second. When playback reaches the last fraction of a second, it clicks
-YouTube's own "next" button (falling back to an `ArrowDown` key press). All logic lives in
-[`content.js`](content.js).
+YouTube's own "next" button (falling back to an `ArrowDown` key press). The page logic lives in
+[`content.js`](content.js); [`background.js`](background.js) only handles the toolbar icon.
 
 ## Troubleshooting
 
@@ -73,14 +76,24 @@ YouTube's own "next" button (falling back to an `ArrowDown` key press). All logi
 
 ## Contributing
 
-Issues and pull requests are welcome. Keep it small and dependency-free.
+Issues and pull requests are welcome. The extension itself has no dependencies, please keep it that way.
+
+An end-to-end test loads the extension into Chromium and checks it against the real Shorts page:
+
+```bash
+npm install
+npx playwright install chromium
+npm test            # HEADED=1 npm test to watch it
+```
+
+YouTube changes its markup from time to time. If the test fails, the selectors in `content.js` are the first place to look.
 
 ## Türkçe
 
 YouTube Shorts'ta video bitince otomatik olarak bir sonrakine geçen küçük bir Chrome eklentisi.
 Kurmak için [Releases](https://github.com/ozanmanav/youtube-shorts-autoscroll/releases) sayfasından
 zip'i indir, `chrome://extensions` sayfasında **Developer mode**'u aç ve **Load unpacked** ile klasörü seç.
-Sağ alttaki butonla ya da `Alt + S` ile açıp kapatabilirsin.
+Sağ alttaki butonla, toolbar'daki eklenti icon'una tıklayarak ya da `Alt + S` ile açıp kapatabilirsin.
 
 ## License
 
