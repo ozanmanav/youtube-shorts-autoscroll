@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/e2e.mjs"
+    "test": "node tests/e2e.mjs",
+    "test:background": "node tests/background.mjs"
   },
   "devDependencies": {
     "playwright": "^1.65.1"
