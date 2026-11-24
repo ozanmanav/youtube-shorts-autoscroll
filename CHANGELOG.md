@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 - 2026-11-24
+
+- Keeps auto scrolling while the Shorts tab is in the background.
+- Detects the end of a Short from the video's own events instead of a timer.
+- Background-tab test (`npm run test:background`).
+
 ## 1.2.0 - 2026-11-24
 
 - Click the toolbar icon to toggle auto scroll; the badge shows ON or OFF.
