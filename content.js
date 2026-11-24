@@ -13,6 +13,13 @@ chrome.storage.local.get({ enabled: true }, (data) => {
   renderButton();
 });
 
+// Keep every open tab in sync when the setting changes anywhere
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local" || !changes.enabled) return;
+  enabled = changes.enabled.newValue;
+  renderButton();
+});
+
 function isShortsPage() {
   return location.pathname.startsWith("/shorts/");
 }
@@ -50,9 +57,7 @@ setInterval(() => {
 }, POLL_INTERVAL_MS);
 
 function toggle() {
-  enabled = !enabled;
-  chrome.storage.local.set({ enabled });
-  renderButton();
+  chrome.storage.local.set({ enabled: !enabled });
 }
 
 // Keyboard shortcut: Alt+S toggles auto scroll (ignored while typing)
